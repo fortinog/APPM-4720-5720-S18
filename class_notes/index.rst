@@ -1,0 +1,91 @@
+
+APPM 4720-5720: High Performance Computing Spring 2018
+=============================================================
+
+This course is an introductory course in scientific computing and will cover a wide variety of topics, some of them are listed below. 
+
+In designing the course I have been inspired by Randall J. LeVeque's course `AMath 483/583`__ so if you find that your are missing some information on these pages or if you want a slightly different description of some topic his `class notes`__ should be a good source of information. 
+
+__ http://faculty.washington.edu/rjl/classes/am583s2014/notes/index.html
+__ http://faculty.washington.edu/rjl/classes/am583s2014/notes/index.html
+
+The course repository where these notes and other files from class can be found is  `here`__.
+
+__ https://github.com/appelo/APPM-4720-5720-S18
+
+**News**
+
+  * Note that the textbook *Introduction to High-Performance Scientific Computing* by Victor Eijkhout is available `here`__. 
+     
+__ https://bitbucket.org/VictorEijkhout/hpc-book-and-course/
+
+
+**General information:**
+
+.. toctree::
+   :maxdepth: 1
+   
+   Syllabus
+   
+**Homework:**
+
+.. toctree::
+   :maxdepth: 1
+
+   Homework
+   Homework1
+..   Homework2
+..   Homework3
+..   Homework4
+..   Homework5
+..  Homework6
+..  Homework7
+
+**Slides:**
+
+   * `Slides for lecture 2`__.
+   * `Slides for lecture 3`__.
+
+__ http://www.chides.org/APPM5720/slides/Lecture2.html
+__ http://www.chides.org/APPM5720/slides/Lecture3.html 
+
+
+   
+**Technical topics:**
+
+.. toctree::
+   :maxdepth: 1
+   
+   LINUX
+   VersionControl
+   GIT
+   perl
+   FORTRAN_BASIC
+   FiniteDifferences
+   FORTRAN_FD_EXAMPLE
+
+
+..   
+   Fortran
+   Using Git and Bitbucket.
+   Introduction to Fortran 90
+   Makefiles
+   Basic Python / perl
+   NumPy and Scipy
+   Debugging Python
+   Compiled vs. interpreted languages
+   Computer architecture: CPU, memory access, cache hierachy, pipelining
+   Optimizing Fortran
+   BLAS and LAPACK routines
+   Parallel computing
+   OpenMP with Fortran
+   MPI with Fortran
+   Parallel Python
+   Graphics and visualization
+   I/O, Binary output
+   ODE methods
+   Basic concepts of parallelism 
+   Parallel matrix computations 
+   BLAS and memory hierarchy 
+   Finite difference methods
+   
