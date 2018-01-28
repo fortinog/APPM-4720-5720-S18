@@ -19,6 +19,15 @@ __ https://github.com/appelo/APPM-4720-5720-S18
      
 __ https://bitbucket.org/VictorEijkhout/hpc-book-and-course/
 
+  * ProGit is available `here`__. 
+     
+__ https://git-scm.com/book/en/v2
+
+   * J. S. Hesthaven and T. Warburton, Nodal Discontinuous Galerkin
+     Methods - Algorithms, Analysis, and Applications (Springer
+     2008). Details here__ (can also be downloaded through the library).
+
+__ http://www.springer.com/us/book/9780387720654
 
 **General information:**
 
@@ -34,8 +43,8 @@ __ https://bitbucket.org/VictorEijkhout/hpc-book-and-course/
 
    Homework
    Homework1
-..   Homework2
-..   Homework3
+   Homework2
+   Homework3
 ..   Homework4
 ..   Homework5
 ..  Homework6
@@ -45,10 +54,13 @@ __ https://bitbucket.org/VictorEijkhout/hpc-book-and-course/
 
    * `Slides for lecture 2`__.
    * `Slides for lecture 3`__.
-
+   * `Slides for lecture 4`__.
+   * `Slides for lecture 5`__.
+     
 __ http://www.chides.org/APPM5720/slides/Lecture2.html
 __ http://www.chides.org/APPM5720/slides/Lecture3.html 
-
+__ http://www.chides.org/APPM5720/slides/Lecture4.html 
+__ http://www.chides.org/APPM5720/slides/Lecture5.html 
 
    
 **Technical topics:**

@@ -1,7 +1,7 @@
 .. -*- rst -*- -*- restructuredtext -*-
 
 ===============================
-Homework 2, due 08.00, 5/9-2014
+Homework 2, due 08.00, 2/2-2018
 ===============================
 
 Managing your computations through scripting
@@ -28,7 +28,7 @@ Start by pulling the latest version of our repo where you should find the two fi
  
   Can you find a more elegant (less readable) way to do this? This kind of operation can be good if you need to reformat your output to conform with some particular table format, for example in :math:`\LaTeX`. 
 
-7. Summarize your findings in a report where you use your tabulated data. Make sure to check the report and codes into your repository and to add a description in the README file where I find the report and codes and how I could go about running your code. 
+7. Summarize your findings in a report where you use your tabulated data. Make sure to check the report and codes into your (the groups) repository and to add a description in the README file where I find the report and codes and how I could go about running your code. 
 
 __ http://en.wikipedia.org/wiki/Do_while_loop#Fortran
 

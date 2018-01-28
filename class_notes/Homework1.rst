@@ -90,11 +90,11 @@ Version control and Git
 
         Initial commit
 
-     Now, suppose we want to go back to the initial commit, then the
-     important number is the commit SH1 string `12d3ece...` If we do
-     `git checkout 12d3ece -b pom-fix` then in one stroke we create a
+     Now, suppose we want to go back to the second commit, then the
+     important number is the commit SH1 string `f2a2971ff7...` If we do
+     `git checkout f2a2971ff7 -b pom-fix` then in one stroke we create a
      branch called `pom-fix` which is an identical copy of the master
-     branch at the time of the commit `12d3ece...`. To see what
+     branch at the time of the commit `f2a2971ff7...`. To see what
      branches you have you can say `git branch`. 
 
 13. Replace Pomperipossa with Gargamel and add and commit in your

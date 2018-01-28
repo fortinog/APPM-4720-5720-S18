@@ -1,3 +1,5 @@
+.. include:: .special.rst
+
 +++++++++
 Lecture 4
 +++++++++
@@ -5,14 +7,51 @@ Lecture 4
 **Basic Perl**
 
 
+
+
 Outline
 =======
 
-0. Perl scripts
-1. Scalar Data
-2. Lists and arrays
-3. Input Output
-4. Regular Expressions
+0. Why scripting
+1. Perl scripts
+2. Scalar Data
+3. Lists and arrays
+4. Input Output
+5. Regular Expressions
+
+We won't talk about subroutines etc.
+   
+A good reference:
+
+``https://learn.perl.org/books/beginning-perl/``
+   
+
+Why scripting
+========================
+
+Figure below is from a recent paper I wrote, there are 150
+computations in each picture (one for each marker) and there is
+probably around 20 figures in the paper. So a total of 3000 setups
+using different parameters.
+
+If each setup takes 30 seconds to change, save compile and start the
+run, the setup time is 25h!
+
+
+  .. image:: why_script.pdf
+   :width: 700px
+   
+
+
+Typical tasks
+========================
+	   
+- Run a simulation using 1,2,3,... number of gridpoints.
+- Format the output of a simulation.
+- Produce a latex table from data.
+- Do it all at once. 
+- Launch multiple simulations at once.
+  
 
 
 Perl scripts
@@ -74,12 +113,15 @@ A single quote string literal is just a collection of characters which mean exac
  Apan\
  $ 
 
+Full stop concatenates strings. 
+
+ 
 Strings
 =======
 
 **Double Quotes**
 
-A double quote string literal a bit different in that it interpolates variables and supports backslash escapes
+A double quote string literal a bit different in that it :red:`interpolates` variables and supports backslash escapes
 
 .. code-block:: none
 
@@ -333,5 +375,3 @@ Often you want to find a pattern in a string and change it. The substitution, ``
  lakeman pa skeppet.
 
 
-Homework 2
-==========
