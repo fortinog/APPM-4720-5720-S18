@@ -1,0 +1,292 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage,amsmath}
+\usepackage{amssymb,verbatim}
+\thispagestyle{empty}
+
+\usepackage{graphicx,amsmath,color,amssymb}
+\usepackage{psfrag,picture}
+
+\newcommand{\ba}{\begin{array}}
+\newcommand{\ea}{\end{array}}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\bd}{\begin{displaymath}}
+\newcommand{\ed}{\end{displaymath}}
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\bn}{\begin{enumerate}}
+\newcommand{\en}{\end{enumerate}}
+\newcommand{\pa}{\partial}
+\newcommand{\f}{\frac}
+\newcommand{\ci}{\cite}
+\newcommand{\eps}{\epsilon}
+\newcommand{\del}{\delta}
+%\newcommand{\cal}{\mathcal}
+\newtheorem{lem}{Lemma}
+\newtheorem{truth}{Theorem}
+\newtheorem{prob}{Problem}
+\newtheorem{corl}{Corollary}
+\newtheorem{rem}{Remark}
+\newcommand{\dbl}{[[}
+\newcommand{\dbr}{]]}
+\newcommand{\dsl}{\{\{}
+\newcommand{\dsr}{\}\}} 
+
+\begin{document}
+\begin{center}
+\textbf{APPM 4720 / 5720 --- HOMEWORK  \# 3\hfill Due: Feb, 2018.}
+\end{center}
+\subsubsection*{Instructions}
+Put away your cell-phone and read this document from start to finish. Discuss in the group what the different instructions and tasks mean. Make sure you have a plan how to achieve the main task (and write up the results!) within the allotted time (team-work is probably needed). How will you check that the subtasks are correct?      
+
+\subsubsection*{Main task}
+Consider a grid with $N+1$ grid-points $x_L = x_0 < x_1 < \ldots < x_N = x_R$, defining $N$ elements $\Omega_i = \{x \in [x_{i-1},x_i]\}, \, i = 1,\ldots,N$. You are to approximate a function $f(x)$ on $ x \in [x_L,x_R]$ by $L_2$-projection onto the space of element-wise Legendre polynomials of degree $q$. That is you must find $c(k,i)$ so that 
+\be 
+\int_{\Omega_i} P_l(r) \sum_{k=0}^{q} c(k,i) P_k(r) dx =  \int_{\Omega_i} P_l(r) f(x) dx, \ \  l = 0,\ldots,q. \label{eq:l2proj}
+\ee
+Here $r \in [-1,1]$ is a local variable such that on element $\Omega_i$ the affine map $x(r)$ satisfies $x(-1) = x_{i-1}$,  $x(1) = x_{i}$ (I use fancy words here so that you don't have to be afraid of them the next time you see them, just find $a, b$ so that $x(r) = ar + b$ satisfies the two conditions, it is easy!). 
+
+\subsubsection*{Subtasks}
+Feel free to use available open source code for the tasks below. Make sure you give appropriate credit and that you respect the licensing requirements (if any).  
+\begin{enumerate}
+\item Write a module \verb+type_defs.f90+ that defines \verb+sp+,  \verb+dp+, etc. Use this module in all of the code you write in this class.
+\item Write a module \verb+leg_funs.f90+ that contains functions for evaluating Legendre polynomials (and eventually their derivatives) of degree $k$. 
+\item Write a module \verb+quad_1d.f90+ that defines a type \verb+quad_1d+ that holds the start and end coordinate of the element, the degree of the element $q$ and a two dimensional allocatable array of size \verb+(0:q,nvars)+. In this homework \verb+nvars+ is one as you are approximating a single function but in a later homework when you solve systems of PDE it will be greater than one. The module should contain internal subroutines that ``allocates a quad'' and ``deallocates a quad''. We will stick more information into this structure, can you think of some things that could be good to know once the elements starts to communicate with each other?       
+\item You should approximate the integrals by Gauss quadrature on Gauss-Legendre-Lobatto nodes and of sufficiently high degree (how high?). You may want to use the existing code \verb+lglnodes.m+ by Greg von Winckel (after translating it to Fortran). Note that the integrals are carried out on the reference domain $r\in[-1,1]$ so you have to perform a (as discussed above) change of variables $dx = x_r(r) dr$
+\item Write routines that can output the approximation on a given grid (not necessarily the same as the one above). This does not have to be super general but at least make sure you can (over)sample the solution on each element. 
+\item Note that (\ref{eq:l2proj}) are a set of $N$ decoupled linear systems of equations of size $(q+1) \times (q+1)$. Do you have to write a routine that performs Gauss elimination (or more precisely call \verb+LAPACK+)? Why not?  
+\item Your approximation can be stored in a \verb+quad_1d+ array with $N$ entries, say:\\
+\verb+ type(quad_1d), dimension(:), allocatable :: qds_1d+ \\
+which can be ordered from left to right. Note that in multiple dimensions such an array may not have a natural ordering and for example element 1 and 2 may be far away from each other.   
+\end{enumerate}
+
+\subsubsection*{To be reported (minimum)}
+Write up a short report in \LaTeX where you describe your findings. 
+\begin{enumerate}
+\item For at least three different functions $f(x)$ provide evidence that for $q = 0,1, \ldots$, your approximation is increasingly accurate with an increasing number of elements as measured in uniform and $L_2$-norm. For example you can provide log-log plots where the errors are displayed as functions of the (typical) element size. 
+\item Fix the number of elements and inspect how the error decreases as you increase $q$. Can you fit (by trial and error) a function of the type $c^{-q}$ to the error?
+\item Use a script to carry out the collection of the data required to produce the figures / tables in your report. 
+\item Be curious. What happens if $f(x)$ is not smooth? Suppose you have equidistant $x_0,x_1$ etc. how does the rates of convergence compare when you add (small, say 5\%) random perturbations to the grid? Suppose you prefer Chebyshev or monomials, what would change?  
+\end{enumerate}
+
+
+\end{document}
+\section*{The Problem}
+Consider the scalar wave equation in second order form:
+\be
+\f {\pa^2 u}{\pa t^2} = c^2 \nabla^2 u + f({\bf x},t), \ \ {\bf x} \in \Omega \subset \mathbb{R}^d ,
+\ \ t >0, 
+\ee
+where the wave speed, $c > 0$, is for now assumed to be constant and 1. On $\pa \Omega$
+we impose homogeneous boundary conditions
+\be
+\alpha \f {\pa u}{\pa t} + \beta c \nabla u \cdot {\bf n} =0, \label{bcs}
+\ee
+where $\alpha$ and $\beta$ are nonnegative functions, $\alpha^2+\beta^2=1$,
+and ${\bf n}$ is the outward unit normal. (Note that $\alpha=1$, $\beta=0$ is our
+formulation of Dirichlet conditions and $\alpha=0$, $\beta=1$ is our formulation of
+Neumann conditions.) We rewrite in first order form in time by introducing $v= \f {\pa u}{\pa t}$:
+\be
+\f {\pa u}{\pa t}  = v, \ \ \f {\pa v}{\pa t}  =  c^2 \nabla^2 u, \label{veq}
+\ee
+and impose initial conditions
+\be
+u({\bf x},0)=u_0 ({\bf x}) , \ \ v({\bf x},0)=v_0({\bf x}) . \label{ics}
+\ee
+ 
+Recall the usual energy:
+\be
+E(t) = \f {1}{2} \int v^2 + c^2 \arrowvert \nabla u \arrowvert^2. 
+\ee
+Our goal is to introduce a DG formulation based on the 
+Sommerfeld flux associated with $E$. Suppose
+\be
+\bar{\Omega} = \bigcup_j \Omega_j ,
+\ee
+where the mesh elements $\Omega_j$ will be geometry-conforming and nonoverlapping with
+piecewise smooth boundaries - typically polyhedra away from $\pa \Omega$. 
+
+Specializing to the case of quads, let $\mathbb{Q}^q$ denote the space of tensor product polynomials of degree $q$ or less in each coordinate on the reference element and ${\bf n}$ denote the outward normal (where defined) on $\pa \Omega_j$. The approximations to $U=(u,v)$, which we denote by $U^h=(u^h,v^h)$, will be elements of ${\mathcal P}^q$, the space of piecewise polynomials whose restriction to $\Omega_j$ are elements of
+$\mathbb{Q}^{q+1} (\Omega_j) \times \mathbb{Q}^q (\Omega_j)$.
+
+On $\Omega_j$ we impose:
+\begin{prob}\label{varP}
+For all
+$\phi_v \in \mathbb{Q}^q(\Omega_j)$, $\phi_u \in \mathbb{Q}^{q+1}(\Omega_j)$ 
+\begin{eqnarray}
+\int_{\Omega_j} \nabla \phi_u \cdot \nabla \left( \f {\pa u^h}{\pa t}-v^h \right) = 
+\int_{\pa \Omega_j} \nabla \phi_u \cdot {\bf n} \left( v^{\ast} - v^h \right) . 
+\label{var1} \\
+\int_{\Omega_j} \phi_v \f {\pa v^h}{\pa t} + c^2 \nabla \phi_v \cdot \nabla u^h  - \phi_v f & = &
+c^2 \int_{\pa \Omega_j} \phi_v {\bf w}^{\ast} \cdot {\bf n} , \label{var2}  \\
+\int_{\Omega_j} \left( \f {\pa u^h}{\pa t}-v^h \right) & = & 0. \label{var0}
+\end{eqnarray}
+\end{prob}
+
+\section*{Numerical fluxes}
+In your program implement both of these. Note that the central flux is a subset of the upwind flux.
+
+\subsection*{Upwind flux}
+To define an upwind flux we choose $(v^{\ast},{\bf w}^{\ast})$ based on the
+outward Sommerfeld fluxes, $v^h - c (\nabla u^h) \cdot {\bf n}$. Following the
+standard convention let the superscripts
+``$\pm$'' refer to traces of data from outside and inside the element 
+respectively. Then we impose the following equations whose solution defines
+the fluxes:
+\begin{eqnarray*}
+v^{\ast} -c {\bf w}^{\ast} \cdot {\bf n}^{-} & = & v^{-} - c \nabla u^{-} \cdot {\bf n}^{-},  \\
+v^{\ast} -c {\bf w}^{\ast} \cdot {\bf n}^{+} & = & v^{+} - c \nabla u^{+} \cdot {\bf n}^{+},
+\end{eqnarray*}
+\begin{eqnarray}
+v^{\ast} = & \f {v^{-} + v^{+}}{2} - \f {c}{2} \left( \nabla u^{-} \cdot {\bf n}^{-}
++ \nabla u^{+} \cdot {\bf n}^{+} \right) & \equiv \dsl v^h \dsr - \f {c}{2} \dbl \nabla u^h
+\dbr , \label{vstardef} \\ 
+{\bf w}^{\ast} = &  - \f {1}{2c} \left( {\bf n}^{-} v^{-} + {\bf n}^{+} v^{+} \right) + \f {1}{2} \left( 
+\nabla u^{-} + \nabla u^{+} \right) & \equiv  - \f {1}{2c} \dbl v^h \dbr 
++ \dsl \nabla u^h \dsr . \label{wstardef} 
+\end{eqnarray}
+Here let $\dsl \cdot \dsr$ denote
+the average of either a scalar or vector across a face, $\dbl \eta \dbr \equiv {\bf n^{-}} \eta^{-}
++ {\bf n^{+}} \eta^{+}$ denote the jump of a scalar, and $\dbl {\mathbf{g}} \dbr \equiv {\bf n^{-}} 
+\cdot {\mathbf{g}}^{-} + {\bf n^{+}} \cdot {{\mathbf{g}}}^{+}$ denote the jump of a vector. 
+ 
+\subsection*{Central flux}
+Alternatively we can use the central flux:
+\be
+v^{\ast} = \dsl v^h \dsr , \ \ {\bf w}^{\ast} = \dsl \nabla u^h \dsr. \label{cflux}
+\ee
+
+
+\subsection*{States for the Fluxes at the Boundary}
+To approximate the boundary conditions we set $(v^{+},\nabla u^{+} \cdot {\bf n}^{+})$ so that:
+\begin{description}
+\item[i.] No jumps are created for
+fields satisfying (\ref{bcs}) exactly; this is accomplished by imposing jumps proportional to the residual of the boundary conditions.
+\item[ii.] The average values of the terms on the lefthand side of (\ref{bcs}) are zero.
+\end{description}
+A simple choice satisfying these conditions is:
+\begin{eqnarray}
+v^{+} & = & v^{-} -2 \alpha \left( \alpha v^{-} + \beta c \nabla u^{-} \cdot {\bf n}^{-} \right), \label{vbc} \\
+\nabla u^{+} \cdot {\bf n}^{+} & = & - \nabla u^{-} \cdot {\bf n}^{-} + 2 \f {\beta}{c} \left(
+\alpha v^{-} + \beta c \nabla u^{-} \cdot {\bf n}^{-} \right) . \label{unbc}
+\end{eqnarray}
+
+\section*{Implementation Assignments}
+\begin{enumerate}
+\item {\bf Getting familiar with DG.} Your first assignment in this homework is to modify the one dimensional version of the above method to use Chebyshev or Legendre polynomials rather than monomials. 
+
+Starting in one dimension, assume that the computational domain has been discretized by a uniform grid 
+$x_0,\ldots,x_j,x_{j+1},\ldots x_n$ with spacing $h$. Let $x_{j+\f{1}{2}} = (x_j+x_{j+1})/2$ then the mapping 
+$z = \f{2}{h} (x-x_{j+\f{1}{2}})$ takes element $\Omega_j$ to the reference element $\Omega=[-1,1]$ where we expand the displacement and velocity in test functions: 
+\begin{eqnarray}
+u_j^h(x,t) &=& \sum_{l = 0}^{q+1} \hat{u}^h_{l,j}(t) \phi_l(z), \label{eq:uexp} \\
+v_j^h(x,t) &=& \sum_{l = 0}^{q} \hat{v}^h_{l,j}(t) \psi_l(z).
+\end{eqnarray} 
+It is convenient to arrange the expansion coefficients into ${\bf \hat{u}} = [\hat{u}^h_{0,j}, \hat{u}^h_{1,j}, \ldots, \hat{u}^h_{q+1,j}]^T$ 
+and ${\bf \hat{v}} = [\hat{v}^h_{0,j}, \hat{v}^h_{1,j}, \ldots, \hat{v}^h_{q,j}]^T$.  The discrete version 
+of (\ref{var2}) on an element can then be written
+\be
+M^v {\bf \hat{v}}^\prime(t) + S^{u} {\bf \hat{u}}(t) = {\mathcal F}^v.
+\ee
+The extra equation (\ref{var0}) and the variational equation (\ref{var1}) can also be assembled into the system 
+\be
+M^u {\bf \hat{u}}^\prime(t) + S^{v} {\bf \hat{v}}(t) = {\mathcal F}^u,
+\ee
+where the exact expressions for the mass and stiffness matrices and the flux terms are:
+\begin{align}
+&M^v_{k,l} = \f{h}{2} \int_{-1}^{1} \psi_k(z)\, \psi_l(z) dz, && k,l = 0,\ldots,q, \label{eq:mass1}\\
+&M^u_{0,l} = \f{h}{2} \int_{-1}^{1} \phi_l(z) dz, && l = 0,\ldots,q+1, \\
+&M^u_{k,l} = \f{h}{2}\f{4}{h^2}\int_{-1}^{1} \phi^{\prime }_k(z) \, \phi^{\prime}_l(z) dz, && k = 1,\ldots,q, \ \ l = 0,\ldots,q+1, \\
+&S^v_{0,l} = - \f{h}{2}\int_{-1}^{1} \psi_l(z) dz, && l = 0,\ldots,q, \\
+&S^v_{k,l} =  -\f{h}{2} \f{4}{h^2}\int_{-1}^{1} \psi^{\prime}_k(z) \, \phi^{\prime}_l(z) dz  + \left[ \f{2}{h} \psi^{\prime }_k(z) \, 
+\psi_l(z) \right]_{-1}^{1}, && k = 1,\ldots,q,\, l = 0,\ldots,q+1, \\
+&S^u_{k,l} = \f{h}{2}\f{4}{h^2}\int_{-1}^{1} \psi^{\prime}_k(z) \, \phi^{\prime}_l(z) dz, && k = 0,\ldots,q, \ \ l = 0,\ldots,q+1.  \label{eq:masslast}
+\end{align}
+Here the factors $\f{h}{2}, \, \f{2}{h}$ appear from the integral and derivative due to the change of variables, they are the one dimensional version of the surface element and metric.
+The flux terms are 
+\begin{eqnarray}
+{\mathcal F}^v_l &=&  \left[ w^{\ast} \psi_l(z(x)) \right]_{x_j}^{x_{j+1}}, \ \ l = 0,\ldots,q, \\
+{\mathcal F}^u_l &=&  \f{2}{h} \left[v^{\ast}  (\phi^{\prime}_l (z(x))) \right]_{x_j}^{x_{j+1}}, \ \ l = 0,\ldots,q+1.
+\end{eqnarray}
+Note that the normals are included in the standard notation for the boundary contribution: 
+\[
+\left[ \kappa(x) \right]_{x_j}^{x_{j+1}} = \kappa(x_{j+1})-\kappa(x_j).
+\]
+
+For the first assignment you can compute the integrals exactly by using sufficiently high order Gauss quadrature. You can use RK4 for the time discretization. 
+
+\item {\bf Verification of order of accuracy}. To verify the order of accuracy of the methods solve $u_{tt} = u_{xx}$ on $-1\le x \le 1, \, 0 \le t \le 2$ with some initial data that is zero (or close to zero) on the boundaries. Pick either Dirichlet or Neumann boundary conditions and look at how the solution evolves. You should be able to use the initial data to compute the error at time 2 (it will either be the same as the initial data or same but with different sign). 
+
+\item {\bf Two dimensional implementation version 1.}
+For your first version of the solver just consider the case of a single element coinciding with the reference element ($\Omega_1 = \Omega$). Let $q=0$ and work with monomials so that $\mathbb{Q}^{1} (\Omega) = \{1,r,s,rs\}$ and $ \mathbb{Q}^0 (\Omega) = \{1\}$. Set $f = 0$ in (\ref{var2}) and let $\alpha = 1$ on two boundaries and $\alpha = 0$ on two (keep this general though, so you can change later). Finally let the initial data be 
+\[
+u_0(x,y) = \cos(x) \sin(y), \ \ v_0(x,y) = e^{-\frac{x^2+y^2}{2}}.
+\] 
+
+As $\Omega_1 = \Omega$ the mapping is simply $(x(r,s),y(r,s)) = (r,s)$. Write out equations (\ref{var1}) - (\ref{var0}) in terms of integrals over $r$ and $s$ and differentiation with regards to $r$ and $s$. That is, use the chain rule $\pa_x = r_x \pa_r + s_x \pa_s$, etc.  to replace derivatives and use the change of variables from the previous homework to change the domain of integration. For this element $r_x, r_y, s_x,s_y$ are very easy to compute by hand but for the rest of the assignment you will have to compute them numerically.
+
+Find, by hand, the $5 \times 5$ system governing the evolution of $u^h$ and $v^h$ (including the initial data).  
+  
+\item {\bf Two dimensional implementation version 2.} Next, consider a general $q$ and a tensor product polynomial basis expressed in Chebyshev or Legendre polynomial. For example with a Chebeyshev basis, $T_l(z), \, z \in[-1,1]$, this would mean
+\begin{eqnarray}
+u^h(x(r,s),y(r,s),t) &=& \sum_{k = 0}^{q+1} \sum_{k = 0}^{q+1} \hat{u}^h_{k,l}(t) T_k(r) T_l(s), \label{eq:uexp} \\
+v^h(x(r,s),y(r,s),t) &=& \sum_{k = 0}^{q} \sum_{k = 0}^{q} \hat{v}^h_{k,l}(t) T_k(r) T_l(s).
+\end{eqnarray} 
+Hint: To check this implementation you can use that the approximation is the same as in the previous case when $q = 0$.
+
+Now you will have to compute the elements of the various matrices using numerical quadrature (preferably Gauss-Legendre-Lobatto where the endpoints are included). An excellent subroutine for finding the nodes and the weights (implemented by  Greg von Winckel who is a former UNM applied math graduate student) are found here: \verb+http://bit.ly/1GOOFIB+ 
+
+Again, let $\Omega_1 = \Omega$ but this time compute $r_x$ etc. at all the grid points (the quadrature nodes). Use Bengt Fornberg's algorithm to do this, see: 
+\verb+http://bit.ly/14d2UI7+
+There is also a Matlab version of the \verb+weights.f+ code here: 
+\verb+http://bit.ly/1ubmuOI+
+
+As you know what the metric are supposed to be you should be able to check that you are doing the right thing. Once done, perform the integrals (keeping all the metric and $J$ in the formulation). Check that this gives you the same answer as in the first version when you use $q = 0$.
+
+\item {\bf Two dimensional implementation version 3.} Discretize the equations in time using Runge-Kutta 4 and set the boundary and initial conditions and $\omega$ so that an exact solution is
+\[
+u(x,y,t) = \sin(\pi x ) \cos (\pi y) \cos( \omega t).
+\]
+Increase $q$ and plot the error as a function of $q$ to make sure your implementation is correct.
+
+\item {\bf Two dimensional implementation version 4.} Finally (almost), consider a general element who's boundaries are parametrized so that you can use the Gordon-Hall mapping (see equation (8.8.23) in {\it Spectral Methods: Evolution to Complex Geometries and Applications to Fluid Dynamics}, Claudio Canuto, Alfio Quarteroni, M. Yousuff Hussaini, Thomas A. Zang Jr. This book is available electronically from the library.
+
+\item {\bf Two dimensional implementation version 5. More than one element.} Generalize your solver to handle many (at least 2) elements. 
+\end{enumerate}
+
+\section*{The FUN Part!} 
+Now when you have your solver working it is time to use it for something! You can use your imagination to come up with your own experiments and simulations but here are some suggestions: 
+\begin{enumerate}
+\item Look at the paper at \verb+http://bit.ly/1u1yilb+ and repeat the experiment in  Section 3.4.
+\item Read Section 3.5 in the same paper and find some interesting shapes that you compute the eigenfrequencies for. 
+
+\item Create a mesh (you can do this with a single element but the results will probably be better if you have many elements) shaped like the horn antenna below (the solid curves). 
+\begin{figure}[hb]
+\begin{center}
+\includegraphics[width=0.4\textwidth]{antenna}
+\end{center}
+\end{figure}
+
+Add a forcing inside the antenna
+\[
+f(x,y,t) = \sin(\omega t) \rho (x,y),
+\]
+and observe how the wave pattern is affected by changing the frequency $\omega$ and / or the shape of the domain. As you add energy to the system you might want to change the boundary conditions to be energy absorbing by setting $0 < \alpha < 1$ on the outer dashed curve. Experiment to find a good $\alpha$. 
+
+\item The wave equation propagates sound, can your solver do the same? Execute:
+\begin{verbatim}
+  load handel;
+  p = audioplayer(y, Fs);
+  play(p, [1 (get(p, 'SampleRate') * 3)]);
+\end{verbatim}
+in Matlab. Your task is to propagate this horrible music from $(x,y) = (-L,0)$ to $(x,y) = (L,0)$. To do this use a forcing
+\[
+f(x,y,t) = H(t)\, e^{-\frac{(x+L)^2+y^2}{\delta^2}},
+\]
+where $H(t)$ is the signal describing the horrible music, and record the computed signal at the microphone at $(x,y) = (L,0)$. Before you do this, estimate how big domain you will have to have to not get any influence of sound bouncing off the walls assuming you have fixed $L$ and that the signal is $T$ time units long (You may find that this is computationally challenging). 
+
+\end{enumerate}
+
+
+
+\end{document}

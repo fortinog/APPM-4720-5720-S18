@@ -15,6 +15,14 @@ __ https://github.com/appelo/APPM-4720-5720-S18
 
 **News**
 
+**Books**
+
+ * Read Part III of `Numerical Solutions of Partial Differential
+   Equations`__ by Silvia Bertoluzza, Silvia Falletta, Giovanni Russo,
+   and Chi-Wang Shu.
+
+__ http://www.springer.com/us/book/9783764389390
+
   * Note that the textbook *Introduction to High-Performance Scientific Computing* by Victor Eijkhout is available `here`__. 
      
 __ https://bitbucket.org/VictorEijkhout/hpc-book-and-course/
@@ -25,9 +33,20 @@ __ https://git-scm.com/book/en/v2
 
    * J. S. Hesthaven and T. Warburton, Nodal Discontinuous Galerkin
      Methods - Algorithms, Analysis, and Applications (Springer
-     2008). Details here__ (can also be downloaded through the library).
+     2008). Details `here`__ (can also be downloaded through the library).
 
 __ http://www.springer.com/us/book/9780387720654
+
+   * `Chebyshev and Fourier Spectral Methods, by John P. Boyd`__ 
+
+__ http://www-personal.umich.edu/~jpboyd/BOOK_Spectral2000.html
+
+   * Spectral Methods in Fluid Dynamics by Claudio Canuto, M. Yousuff
+     Hussaini, Alfio Quarteroni, Thomas A. Zang.
+     Details  `here`__ (can also be downloaded through the library). 
+
+__  http://www.springer.com/us/book/9783540522058    
+
 
 **General information:**
 
@@ -45,6 +64,7 @@ __ http://www.springer.com/us/book/9780387720654
    Homework1
    Homework2
    Homework3
+   Homework35
 ..   Homework4
 ..   Homework5
 ..  Homework6
@@ -56,12 +76,15 @@ __ http://www.springer.com/us/book/9780387720654
    * `Slides for lecture 3`__.
    * `Slides for lecture 4`__.
    * `Slides for lecture 5`__.
+   * `Slides for lecture 6`__.
+   * `Slides for lecture 7`__.          
      
 __ http://www.chides.org/APPM5720/slides/Lecture2.html
 __ http://www.chides.org/APPM5720/slides/Lecture3.html 
 __ http://www.chides.org/APPM5720/slides/Lecture4.html 
 __ http://www.chides.org/APPM5720/slides/Lecture5.html 
-
+__ http://www.chides.org/APPM5720/slides/Lecture6.html 
+__ http://www.chides.org/APPM5720/slides/Lecture7.html 
    
 **Technical topics:**
 

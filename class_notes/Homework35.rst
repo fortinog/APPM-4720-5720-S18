@@ -1,12 +1,12 @@
 .. -*- rst -*- -*- restructuredtext -*-
 
-.. _HOMEWORK3:
+.. _HOMEWORK35:
 
 ================================================================
-Homework 3, due 08.00, February 12 2018
+Homework 4, due 08.00, February 19 2018
 ================================================================
 
-See: `hwk3.pdf`__
+See: `hwk4.pdf`__
      
-__ http://www.chides.org/APPM5720/hwk3.pdf
+__ http://www.chides.org/APPM5720/hwk4.pdf
 

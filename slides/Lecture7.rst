@@ -1,137 +1,126 @@
+.. include:: .special.rst
+
 +++++++++
 Lecture 7
 +++++++++
  
-**Finite Differences, More Fortran, and Makefiles**
+**Makefiles**
 
-Recap
-=====
 
-We saw that Taylor series could be used to find approximations to derivatives. Let :math:`x_i + h = x_{i+1}` and denote :math:`f_i = f(x_i)` then: 
+     
+What to think about for dG
+============================
 
-.. math::
-   :nowrap:
-   
-   \begin{eqnarray}
-     f_{i+1} \approx f_i + h \frac{d f_i}{d x} + \frac{h^2}{2} \frac{d^2 f_i}{d x^2} + \frac{h^3}{6} \frac{d^3 f_i}{d x^3} + \mathcal{O}(h^4), \\ 
-     f_{i-1} \approx f_i - h \frac{d f_i}{d x} + \frac{h^2}{2} \frac{d^2 f_i}{d x^2} - \frac{h^3}{6} \frac{d^3 f_i}{d x^3} + \mathcal{O}(h^4).
-   \end{eqnarray}
+ +---------+-----------------------------------------------+ 
+ | |pic1|  +  1. Compute integrals                         +
+ |         +  2. Approximate solution by polynomial        +
+ |         +  3. Store solution on each element            +
+ |         +  4. Line / surface / volume integrals         +
+ |         +  5. Map from reference element and each elem. +
+ |         +  6. Change of variables...                    +
+ +---------+-----------------------------------------------+ 
 
-can be combined to 
+.. |pic1| image:: L5p2.pdf
+   :width: 600px
+
+
+Numerical integration (quadrature)
+==================================================
+
+Consider an integral
 
 .. math::
    :nowrap:
    
    \begin{equation}
-     \frac{f_{i+1} - f_{i-1}}{2h} \approx \frac{d f_i}{d x} + \mathcal{O}(h^2).
+     I =  \int_{-1}^1 f(x) g(x) h(x) dx,
    \end{equation}
 
+What method should you use to compute this integral?
 
-Recap
-=====
 
-To implement this in Fortran it is convenient to use arrays. 
+Trapezoidal rule (bad option)
+==================================================
 
- 1. Arrays in Fortran can be **Allocatable or fixed size**.
- 2. Index starts at 1 by default but can be chosen to start at any number. 
- 3. Intrinsic functions are element wise (except matmul and transpose).
+Recall that for a grid :math:`x_i = X_L + ih, \ \ i = 0,\ldots,n, \ \ h = \frac{X_R-X_L}{n}`, the composite trapezoidal rule is:
 
-Arrays in Fortran
-=================
-**Allocatable or fixed size**
+.. math::
+   :nowrap:
+  
+   \begin{equation}
+     \int_{X_L}^{X_R} f(x) dx \approx h\left(\frac{f(x_0)+f(x_n)}{2} + \sum_{i=1}^{n-1} f(x_i) \right).
+   \end{equation}
 
-.. code-block:: fortran
- :linenos:
- :emphasize-lines: 3,4
+For fun: write a Fortran program that uses the composite trapezoidal rule to approximate any integral for :math:`n = 2,3,\ldots,N`.
+
+There is **ONE** situation where trapezoidal rule is the go-to
+method. Which situation am I talking about?
+
+The trapezoidal rule belongs to a class of quadrature called Newton-Cotes quadrature that approximates integrals using equidistant grids. The order of a composite Newton-Cotes method is typically :math:`s` or math:`s+1`, where :math:`s` is the number of points in each panel (2 for the Trapezoidal rule). 
+
+Gauss Quadrature
+==================================================
+
+Another class of methods is Gauss quadrature. In Gauss quadrature the location of the grid-points (usually referred to as nodes) and weights, :math:`\omega_i`, are chosen so that the order of the approximation to the weighted integral   
+
+.. math::
+   :nowrap:
+  
+   \begin{equation}
+     \int_{-1}^{1} f(z) w(z) dz \approx \sum_{i=0}^n \omega_i \, f(z_i), 
+   \end{equation}
+
+is maximized. Here the weight function :math:`w(z)` is positive and integrable (for example :math:`w(z) = 1`.) For a given :math:`w(z)` the nodes, :math:`z_i` are the zeros of the polynomial :math:`\tau_n = (z-z_0)(z-z_1)\cdots(z-z_n)` satisfying 
+
+.. math::
+   :nowrap:
+  
+   \begin{equation}
+     \int_{-1}^{1} \tau_n(z) q(z) w(z) dz = 0,
+   \end{equation}
+
+for all polynomials :math:`q(z)` of degree less than :math:`n`.
+
+Gauss Quadrature
+==================================================
+
+Nodes, :math:`z_i` are the zeros of the polynomial :math:`\tau_n = (z-z_0)(z-z_1)\cdots(z-z_n)` satisfying 
+
+.. math::
+   :nowrap:
+  
+   \begin{equation}
+     \int_{-1}^{1} \tau_n(z) q(z) w(z) dz = 0,
+   \end{equation}
+
+for all polynomials :math:`q(z)` of degree less than :math:`n`. Or,
+equivalently, the nodes are the zeros to the degree :math:`n`
+orthogonal polynomial associated with the weight function
+:math:`w(z)`. Don't worry if this sounds complicated, we will only
+consider the case :math:`w(z) = 1` and obtain the weights by
+computation. For example you can use the repository subroutine ``lglnodes.f90`` (which is a f90 version of Greg von Winckel's matlab version.) 
  
- integer, parameter :: n = 3
- integer :: i
- real(kind = 8) :: A(1:3,-2:0), B(n,n) 
- real(kind = 8), dimension(:,:), allocatable :: C
-
- allocate(C(0:n-1,0:n-1))
-
- A = 1.d0
- B = 2.d0
- B(3,3) = 0.d0
- C = A+B
- do i = 1,n
-  write(*,*) C(i,:) 
- end do  
- deallocate(C)
-
-
-Arrays in Fortran
-=================
-
 .. code-block:: fortran
- :linenos:
- :emphasize-lines: 11
- 
- integer, parameter :: n = 3
- integer :: i
- real(kind = 8) :: A(1:3,-2:0), B(n,n) 
- real(kind = 8), dimension(:,:), allocatable :: C
 
- allocate(C(0:n-1,0:n-1))
-
- A = 1.d0
- B = 2.d0
- B(3,3) = 0.d0
- C = A+B
- do i = 1,n
-  write(*,*) C(i,:) 
- end do  
- deallocate(C)
-
-Arrays in Fortran
-=================
-
-.. code-block:: fortran
- :linenos:
- :emphasize-lines: 11 
-
- integer, parameter :: n = 3
- integer :: i
- real(kind = 8) :: A(1:3,-2:0), B(n,n) 
- real(kind = 8), dimension(:,:), allocatable :: C
-
- allocate(C(0:n-1,0:n-1))
-
- A = 1.d0
- B = 2.d0
- B(3,3) = 0.d0
- C = A*B
- do i = 1,n
-  write(*,*) C(i,:) 
- end do  
- deallocate(C)
+     call lglnodes(x,w,n)
+     f = exp(cos(pi*pi*x))
+     Integral_value = sum(f*w)
 
 
+RECAP: Compiling, linking and building an executable
+======================================================================
 
-Arrays in Fortran
-=================
+   .. code-block:: none
 
-.. code-block:: fortran
- :linenos:
- :emphasize-lines: 11
- 
- integer, parameter :: n = 3
- integer :: i
- real(kind = 8) :: A(1:3,-2:0), B(n,n) 
- real(kind = 8), dimension(:,:), allocatable :: C
+     $ gfortran -c type_defs.f90		   
+     $ gfortran -c quat_module.f90		   
+     $ gfortran -c apa.f90
+     $ gfortran -o apa.x apa.o quad_module.o type_defs.o
+     
+Once the number of files become moderately large this method does not
+work and we will use make instead. 
 
- allocate(C(0:n-1,0:n-1))
 
- A = 1.d0
- B = 2.d0
- B(3,3) = 0.d0
- C = matmul(A,B)
- do i = 1,n
-  write(*,*) C(i,:) 
- end do  
-
- deallocate(C)
 
 Show Demo Example
 =================
@@ -143,21 +132,21 @@ Makefiles
 =========
 
 .. code-block:: make
- :linenos:
+   :linenos:
 
- # Makefile1
- run_it: diff.x
+   # Makefile1
+   run_it: diff.x
 	 ./diff.x   
- # Compile, run, process and open.
- graph_it: diff.x
+   # Compile, run, process and open.
+   graph_it: diff.x
          ./diff.x > out.txt
 	 nohup matlab -nosplash -nodisplay < plot_err.m > o.txt
 	 open -a preview error_v1.eps
 
- diff.x: differentiate_v1.o 
+   diff.x: differentiate_v1.o 
 	 gfortran differentiate_v1.o -o diff.x
 
- differentiate_v1.o: differentiate_v1.f90 
+    differentiate_v1.o: differentiate_v1.f90 
 	 gfortran -c differentiate_v1.f90
 
 

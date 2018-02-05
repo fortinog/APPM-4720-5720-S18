@@ -1,0 +1,177 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage,amsmath}
+\usepackage{amssymb,verbatim}
+\thispagestyle{empty}
+
+\usepackage{graphicx,amsmath,color,amssymb}
+\usepackage{psfrag,picture}
+
+\newcommand{\ba}{\begin{array}}
+\newcommand{\ea}{\end{array}}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\bd}{\begin{displaymath}}
+\newcommand{\ed}{\end{displaymath}}
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\bn}{\begin{enumerate}}
+\newcommand{\en}{\end{enumerate}}
+\newcommand{\pa}{\partial}
+\newcommand{\f}{\frac}
+\newcommand{\ci}{\cite}
+\newcommand{\eps}{\epsilon}
+\newcommand{\del}{\delta}
+%\newcommand{\cal}{\mathcal}
+\newtheorem{lem}{Lemma}
+\newtheorem{truth}{Theorem}
+\newtheorem{prob}{Problem}
+\newtheorem{corl}{Corollary}
+\newtheorem{rem}{Remark}
+\newcommand{\dbl}{[[}
+\newcommand{\dbr}{]]}
+\newcommand{\dsl}{\{\{}
+\newcommand{\dsr}{\}\}} 
+
+\begin{document}
+\begin{center}
+\textbf{APPM 4720 / 5720 --- HOMEWORK  \# 4\hfill Due: Feb 19, 2018.}
+\end{center}
+
+\subsubsection*{Instructions}
+Put away your cell-phone and read this document from start to finish. Discuss in the group what the different instructions and tasks mean. Make sure you have a plan how to achieve the main task (and write up the results!) within the allotted time (team-work is probably needed). How will you check that the subtasks are correct?      
+
+\subsubsection*{Main tasks}
+The main task of this homework is to approximate the transport equation
+\be
+u_t + (au)_x = 0, \ \ x_L \le x \le x_R, \ \ t > 0,
+\ee
+with initial conditions $u(x,0) = f(x)$. 
+
+\subsubsection*{Subtasks}
+At the end of his homework you will have an approximation on the grid from the previous homework but you will get there in steps:
+\begin{enumerate}
+\item Approximate $(au)_x$ on a single element with no boundary conditions. 
+\item Approximate $(au)_x$ on a single element with boundary conditions. 
+\item Approximate $u_t + (au)_x = 0$ on a single element with periodic boundary conditions. 
+\item Approximate $(au)_x$ on a grid with inter-element and physical boundary conditions. 
+\item Approximate $u_t + (au)_x = 0$ on a grid with inter-element and physical boundary conditions (you just wrote your first discontinuous Galerkin solver). 
+\end{enumerate}
+
+\subsubsection*{Approximate $(au)_x$ on a single element with no boundary conditions}
+Let $u$ be a function approximated on $x_L \le x \le x_R,$ by a polynomial $u^h$
+\be
+u(x(r)) \approx u^h \equiv \sum_{k=0}^{q} \hat{u}_k P_k(r).
+\ee
+First consider the case when $a$ is a constant. Your task is to find another polynomial (more precisely the coefficients of that polynomial) 
+\[
+b(x) = \sum_{k=0}^{q} \hat{b}_k P_k(r),
+\]
+such that the coefficients $\hat{b}_k$ solve the linear system of equations 
+\be 
+\int_{x_L}^{x_R} b P_l  dx = \int_{x_L}^{x_R} P_l \frac{d (au^h)}{dx} dx, \ \ l = 0,\ldots,q. \label{eq:1}
+\ee
+To write the system in matrix form we introduce the $(q+1) \times 1$ vectors $\hat{{\bf b}} = [\hat{b}_0, \hat{b}_1, \ldots,\hat{b}_q]^T$, $\hat{{\bf u}} = [\hat{u}_0, \hat{u}_1, \ldots,\hat{u}_q]^T$ along with the matrices $M$ and $S$. We then have (recall a is a constant for now)
+\[
+M \hat{{\bf b}} = a S \hat{{\bf u}}.
+\]
+
+When computing the elements of $M$ and $S$ you should use a quadrature of sufficient degree so that the integrals are computed exactly.
+
+Report the error (max or $L_2$) in the approximation to the derivative as a function of $q$ for a few different $u$. Look up exponential / spectral / algebraic convergence in Boyd's book and indicate which type of convergence you have here. Take the largest value of $q$ large enough so that you see the effects of roundoff. Redo at least one of the error vs. $q$ plots in quadruple precision.    
+
+\subsubsection*{Approximate $(au)_x$ on a single element with boundary conditions}
+Now consider the case when $a = a(x)$ is not a constant. As we have subroutines for computing derivatives of Legendre polynomials, $P^\prime_l$, it is convenient to perform an integration by parts in (\ref{eq:1}) to find
+\be
+\int_{x_L}^{x_R} b P_l  dx = - \int_{x_L}^{x_R} au^h \frac{d P_l}{dx}  dx +  \left[au^h P_l  \right]_{x_L}^{x_R}, \ \ l = 0,\ldots,q. \label{eq:2}
+\ee
+Note that if $a(x)$ is a polynomial the integral can be carried out exactly as long as the degree of the quadrature is high enough, but in the general case the integral will be inexact. 
+
+Note that the term $\left[au^h P_l  \right]_{x_L}^{x_R}$ can be thought of as a sum of two vectors  
+\[
+a(x_R) u^h(x_R) \underbrace{\left[ \begin{array}{c}
+P_0(1)\\
+P_1(1)\\
+\vdots \\
+P_q(1)
+\end{array} \right]}_{{\bf L_R}} 
+- a(x_L) u^h(x_L) \underbrace{\left[ \begin{array}{c}
+P_0(-1)\\
+P_1(-1)\\
+\vdots \\
+P_q(-1)
+\end{array} \right]}_{{\bf L_L}}.
+\]
+Again, we may write (\ref{eq:2}) as a system of equations  
+
+\[
+M \hat{{\bf b}} = -\tilde{S}^a \hat{{\bf u}} + a(x_R) u^h(x_R){\bf L_R} - a(x_L) u^h(x_L){\bf L_L},
+\]
+and solve for $\hat{{\bf b}}$.
+
+Consider the case $-\pi \le x \le \pi$, for  $a(x) = 2/(2+\sin(x))$ and $u(x) = \exp(\sin(x))$ and find and plot the errors in $(au)_x$ as a function of $q$. How accurate do you have to compute the integrals to not loose any accuracy in the approximation of $(au)_x$?  
+
+We will now compute the eigenvalues of the matrix $A$, defined through $\hat{{\bf b}} = A \hat{{\bf u}}$, and must therefore rewrite boundary terms slightly. Note that to compute $u^h(x_R)$ you may simply take the inner product $ {\bf L_R}^T \hat{{\bf u}}$ and we thus have
+\be
+A = M^{-1} \left( -\tilde{S}^1 + {\bf L_R} {\bf L_R}^T - {\bf L_L} {\bf L_L}^T \right).
+\ee
+
+\begin{itemize}
+\item Assume periodic boundary conditions (i.e. use $u^h(x_R) = {\bf L_L}^T \hat{{\bf u}}$) and use the \verb+LAPACK+ routine \verb+dgeev+ to compute the eigenvalues, $\lambda_k$, of the matrix
+\be
+A = M^{-1} \left( -\tilde{S}^1 + {\bf L_R} {\bf L_L}^T - {\bf L_L} {\bf L_R}^T \right)
+\ee
+and plot all of them in the complex plane for a few values of $q$. Also plot $\lambda_{\rm max} = \max_{k} | \lambda_k |$ as a function of $q$. How does $\lambda_{\rm max}$ scale with $q$? 
+\item How does this compare with the ``size'' of $d / dx$ when applied to $u(x) = e^{iqx}$? 
+\item Compare $\lambda_{\rm max}$ with known formulas for $P^\prime_q(\pm 1)$ and $P^\prime_q(0)$.
+\item  Why must $A$ always have an eigenvalue that is identically zero?
+\end{itemize}
+
+\subsubsection*{Approximate $u_t + (au)_x = 0$ on a single element with periodic boundary conditions} 
+For this task let $a$ be a constant. To approximate the solution to $u_t + (au)_x = 0$ we simply replace the role of $b(x)$ with $u^h_t$. Assuming that $u^h(x,t)$ depends on space and time we have 
+\be
+u_t(x,t) \approx \frac{\pa u^h(x(r),t)}{\pa t} \equiv \sum_{k=0}^{q} \hat{u}^\prime_k(t) P_k(r).
+\ee   
+You immediately obtain a system of ordinary differential equations for ${\bf \hat{u}}^\prime(t) $
+\be
+M {\bf \hat{u}}^\prime(t) = -\tilde{S}^a \hat{{\bf u}} + a(x_R) u^h(x_R){\bf L_R} - a(x_L) u^h(x_L){\bf L_L}.
+\ee
+To find the initial data use your codes from homework 3. 
+
+
+To timestep the system you can use RK4. If that is too slow due to excessively small timesteps (stability requires $\lambda_{\rm max} \Delta t  \lesssim 1 $) you can try an implicit method like the trapezoidal method or if you want to be fancy, SDIRK-5-4 or RadauIIA.
+
+Show me some movies of the results of this assignment. Also report (by a \verb+semilogy+ plot of error vs. time) how the $L_2$ error grows in time for some combinations of timesteps an $q$. Can you detect the advertised rate of convergence for the time marching scheme you chose?  
+
+{\em Note that the description of this assignment is rather terse, ask for help if you need it.}
+
+\subsubsection*{Approximate $(au)_x$ on a grid with inter-element and physical boundary conditions} 
+Now consider the grid from homework 3. That is, consider a grid with $N+1$ grid-points $x_L = x_0 < x_1 < \ldots < x_N = x_R$, defining $N$ elements $\Omega_i = \{x \in [x_{i-1},x_i]\}, \, i = 1,\ldots,N$. You are to approximate a function $b(x)$ composed of polynomials of degree $q$ on each element. We denote the polynomials representing $b(x)$ and $u^h(x)$ on element $i$ by $b_i(x)$ and $u^h_i(x)$. 
+
+Equation (\ref{eq:2}) on two adjacent element are 
+\begin{eqnarray}
+\int_{x_{i}}^{x_{i+1}} b_{i+1} P_l  dx &=& - \int_{x_{i}}^{x_{i+1}} au_{i+1}^h \frac{d P_l}{dx}  dx +  \left[au_{i+1}^h P_l  \right]_{x_{i}}^{x_{i+1}}, \\
+\int_{x_{i-1}}^{x_{i}} b_i P_l  dx &=& - \int_{x_{i-1}}^{x_i} au_i^h \frac{d P_l}{dx}  dx +  \left[au_{i}^h P_l  \right]_{x_{i-1}}^{x_{i}}. 
+\end{eqnarray}
+Now, strictly speaking we do not need to connect the elements if we only want to approximate the derivative of $u$. However if we want to solve $u_t+(au)_x = 0$ we will need for information to travel between elements. 
+
+In the above formulas the values $u_{i+1}^h(x_i)$ and $u_{i}^h(x_i)$ both exist at the boundary in-between the elements and we therefore use these to ``connect'' the elements. Precisely we replace the two quantities $au_{i+1}^h(x_i)$ and $au_{i}^h(x_i)$ {\bf by a single value} called the numerical flux and denoted $(au)^\ast$. We will discuss how to chose $(au)^\ast$ in detail later but for no we will simply take it as an average 
+\[
+(au)^\ast = \beta au_{i+1}^h(x_i) + (1- \beta) au_{i}^h(x_i).
+\]  
+
+You have probably noticed that the mass matrix on the left hand sides in the above system of equations can be inverted locally so a good strategy for finding $b(x)$ is 
+\begin{enumerate}
+\item For each element compute the values of $u_h$ on the edges (you probably want to add these ``trace values'' or ``traces'' to your type \verb+quad_1d+). 
+\item For each element compute the numerical fluxes by averaging. Let $\beta$ be a parameter.    
+\item For each element find ${\bf \hat{b}}_i$ from
+\[
+M {\bf \hat{b}}_i = -\tilde{S}^a{\bf  \hat{u}}_i + (a u)^\ast_R {\bf L_R} - (a u)^\ast_L {\bf L_L}, \ \ i = 1,\ldots,N.
+\]
+\end{enumerate}
+
+Now you have two parameters that will effect the error, the degree of the polynomials $q$ and the number of elements $N$. Let $u$ be a periodic function and set $a = 1$ and fix $q$ and investigate how the rate of convergence in the error depends on the numerical flux corresponding to $\beta = 0, 1/2, 1$. You may see different results for even and odd $q$ so repeat the computation for several different choices. 
+
+\subsubsection*{Approximate $u_t + (au)_x = 0$ on a grid with inter-element and physical boundary conditions (you just wrote your first discontinuous Galerkin solver)} 
+Repeat the single elements experiments above but now for your full grid. Here the timestep will need to satisfy  $a \lambda_{\rm max} \Delta t  \lesssim h$, s if you keep the degree $q$ around 5 you should be able to use RK4 without any problems.    
+
+\end{document}
