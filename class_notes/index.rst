@@ -64,8 +64,8 @@ __  http://www.springer.com/us/book/9783540522058
    Homework1
    Homework2
    Homework3
-   Homework35
-..   Homework4
+   Homework4
+   Homework5
 ..   Homework5
 ..  Homework6
 ..  Homework7
@@ -78,14 +78,21 @@ __  http://www.springer.com/us/book/9783540522058
    * `Slides for lecture 5`__.
    * `Slides for lecture 6`__.
    * `Slides for lecture 7`__.          
+   * `Slides for lecture 8-9`__.
+   * `Slides for lecture 11`__.          
      
+
+
 __ http://www.chides.org/APPM5720/slides/Lecture2.html
 __ http://www.chides.org/APPM5720/slides/Lecture3.html 
 __ http://www.chides.org/APPM5720/slides/Lecture4.html 
 __ http://www.chides.org/APPM5720/slides/Lecture5.html 
 __ http://www.chides.org/APPM5720/slides/Lecture6.html 
 __ http://www.chides.org/APPM5720/slides/Lecture7.html 
-   
+__ http://www.chides.org/APPM5720/NUM_PDE_KRAKFOTTER.pdf
+__ http://www.chides.org/APPM5720/2D.pdf
+
+
 **Technical topics:**
 
 .. toctree::
